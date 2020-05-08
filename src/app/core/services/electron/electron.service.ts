@@ -5,6 +5,8 @@ import { Injectable } from '@angular/core';
 import { ipcRenderer, webFrame, remote } from 'electron';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
+import {ISaveOptions} from "../../../shared/interfaces/ISaveOptions";
+import {saveOptions} from "../../../shared/consts";
 
 @Injectable({
   providedIn: 'root'

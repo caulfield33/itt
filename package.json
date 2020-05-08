@@ -83,5 +83,8 @@
   },
   "engines": {
     "node": ">=10.13.0"
+  },
+  "dependencies": {
+    "exceljs": "^3.9.0"
   }
 }
