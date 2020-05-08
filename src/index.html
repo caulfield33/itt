@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ITT</title>
+  <base href="/">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="assets/icons/favicon.ico">
+
+</head>
+<body>
+<script src="assets/lib/tesseract.min.js"></script>
+<script>
+  const {createWorker} = Tesseract;
+  window.tesseractWorker = (logger) => createWorker({
+    workerPath: 'assets/lib/worker.min.js',
+    langPath: 'assets/lib/trainerdata',
+    corePath: 'assets/lib/tesseract-core.wasm.js',
+    logger
+  });
+
+</script>
+
+<app-root>Loading...</app-root>
+</body>
+</html>
