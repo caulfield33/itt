@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {OcrProvider} from "../core/providers/ocr";
 import {ElectronService} from "../core/services";
-const { dialog } = require('electron').remote
+import {ExcelManager} from "../core/utils/excel-manager";
+import {saveOptions} from "../shared/consts";
 
 @Component({
   selector: 'app-home',
@@ -10,9 +11,12 @@ const { dialog } = require('electron').remote
 })
 export class HomeComponent implements OnInit {
 
-  isReady =false;
+  isReady = false;
+  excel: ExcelManager = new ExcelManager(this.es)
 
-  constructor(private ocrProvider: OcrProvider, private electronService: ElectronService) { }
+  constructor(private ocrProvider: OcrProvider,
+              private es: ElectronService) {
+  }
 
   ngOnInit(): void {
     this.ocrProvider.isTesseractLoaded.subscribe(res => {
@@ -22,10 +26,22 @@ export class HomeComponent implements OnInit {
     this.ocrProvider.logs.subscribe(log => {
       console.log(log)
     })
+
+    // this.excel.appendRow({index: 0, path: 'ok', text: 'asdasd', tags: 'dasdasd'})
+    // this.excel.appendRow({index: 0, path: 'ok', text: 'asdasd', tags: 'dasdasd'})
+    // this.excel.appendRow({index: 0, path: 'ok', text: 'asdasd', tags: 'dasdasd'})
+    // this.excel.appendRow({index: 0, path: 'ok', text: 'asdasd', tags: 'dasdasd'})
+    // this.excel.appendRow({index: 0, path: 'ok', text: 'asdasd', tags: 'dasdasd'})
+    // this.excel.appendRow({index: 0, path: 'ok', text: 'asdasd', tags: 'dasdasd'})
+    // this.excel.save({
+    //   ...saveOptions,
+    //   defaultPath: 'tex111t.xlsx'
+    // })
   }
 
+
   test() {
-    dialog.showOpenDialog({
+    this.es.remote.dialog.showOpenDialog({
     }).then(result => {
       console.log(result.canceled)
       console.log(result.filePaths)
