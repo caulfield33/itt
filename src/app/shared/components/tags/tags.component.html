@@ -1,0 +1,95 @@
+<div class="tags-container">
+  <nz-card
+    [nzBordered]="false"
+    nzTitle="Tags"
+    style="padding: 10px"
+    [nzExtra]="info">
+
+    <form
+      nz-form
+      [formGroup]="validateForm">
+
+      <div class="form-inner">
+        <div
+          *ngFor="let control of listOfControl;
+          let index = index">
+
+          <nz-form-item style="max-width: 100%" >
+            <nz-form-control
+              nzErrorTip="Please input tag title or delete this field.">
+
+              <nz-input-group [nzSuffix]="suffixIconClose">
+                <input
+                  nz-input
+                  placeholder="Tag Title"
+                  style="width: 100%;"
+                  [attr.id]="control.id"
+                  [formControlName]="control.tagTitle"
+                />
+              </nz-input-group>
+
+              <ng-template #suffixIconClose>
+                <i nz-icon nzType="minus-circle-o" class="dynamic-delete-button" (click)="removeField(control, $event)"></i>
+              </ng-template>
+
+            </nz-form-control>
+          </nz-form-item>
+
+          <nz-form-item>
+
+            <nz-tag
+              *ngFor="let keywords of tags[index];
+              let i = index"
+              [nzMode]="'closeable'"
+              [nzTooltipTitle]="keywords"
+              nzTooltipPlacement="top"
+              nz-tooltip
+              (nzAfterClose)="handleClose(i)">
+                {{ sliceTagName(keywords) }}
+            </nz-tag>
+
+            <nz-tag
+              style="margin: 5px"
+              *ngIf="!inputVisible[index]"
+              class="editable-tag"
+              nzNoAnimation (click)="showInput(index)">
+                <i nz-icon nzType="plus"></i> New Tag
+            </nz-tag>
+
+            <input
+              #inputElement
+              [ngModelOptions]="{standalone: true}"
+              nz-input
+              nzSize="small"
+              *ngIf="inputVisible[index]"
+              type="text"
+              [(ngModel)]="inputValue"
+              style="width: 100px; margin: 5px;"
+              (blur)="handleInputConfirm(index)"
+              (keydown.enter)="handleInputConfirm(index)"
+            />
+          </nz-form-item>
+          <nz-divider></nz-divider>
+
+        </div>
+      </div>
+
+
+      <nz-form-item>
+        <nz-form-control>
+          <button nz-button nzType="dashed" class="add-button" (click)="addField($event)">
+            <i nz-icon nzType="plus"></i>
+            Add field
+          </button>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+
+  </nz-card>
+
+  <ng-template #info>
+    <a nzTooltipTitle="prompt text" nzTooltipPlacement="bottom" nz-button nz-tooltip>
+      Info <i nz-icon nzType="info-circle" nzTheme="outline"></i>
+    </a>
+  </ng-template>
+</div>

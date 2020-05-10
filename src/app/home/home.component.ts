@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import {OcrProvider} from "../core/providers/ocr";
 import {ElectronService} from "../core/services";
 import {allowedImageExtension} from "../shared/consts";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Observable, Observer, Subscription} from "rxjs";
+import {ITag} from "../shared/interfaces/ITag";
 
 @Component({
   selector: 'app-home',
@@ -11,28 +12,41 @@ import {BehaviorSubject} from "rxjs";
 })
 export class HomeComponent implements OnInit {
 
-  pathsToLoad: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
+  pathToLoad: string = null;
+
+  foundImages: number = 21313
+  customAllowedTypes: string = allowedImageExtension.map(img => `${img}`).join(',')
+  tags: ITag[] = []
+  isLoading = false;
 
   constructor(private ocrProvider: OcrProvider,
               private es: ElectronService) {}
 
   ngOnInit(): void {}
 
+  addTangHandler(tags: ITag[]) {
+    this.tags = tags
+  }
+
 
   async selectHandler() {
     try {
       const {filePaths, canceled} = await this.es.remote.dialog.showOpenDialog({
-        properties: ['multiSelections'],
+        properties: [],
         filters: [
           { name: 'Images', extensions: allowedImageExtension },
         ]
       })
-      this.pathsToLoad.next(canceled ? [] : filePaths)
+      console.log(filePaths)
+      this.pathToLoad = canceled ? null : filePaths[0]
     } catch (e)  {
       console.log(e)
-
-      this.pathsToLoad.next([])
+      this.pathToLoad = null
     }
+  }
+
+  close() {
+    this.pathToLoad = null
   }
 
 }
