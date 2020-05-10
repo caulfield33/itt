@@ -8,3 +8,5 @@ export const saveOptions: ISaveOptions = {
     {name: 'Excel', extensions: ['xlsx']},
   ]
 }
+
+export const allowedImageExtension: string[] = ['bmp', 'jpg', 'png', 'pbm', 'jpeg']

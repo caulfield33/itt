@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import {OcrProvider} from "../core/providers/ocr";
 import {ElectronService} from "../core/services";
-import {ExcelManager} from "../core/utils/excel-manager";
-import {saveOptions} from "../shared/consts";
+import {allowedImageExtension} from "../shared/consts";
+import {BehaviorSubject, Observable, Observer, Subscription} from "rxjs";
+import {ITag} from "../shared/interfaces/ITag";
 
 @Component({
   selector: 'app-home',
@@ -11,48 +12,41 @@ import {saveOptions} from "../shared/consts";
 })
 export class HomeComponent implements OnInit {
 
-  isReady = false;
-  excel: ExcelManager = new ExcelManager(this.es)
+  pathToLoad: string = null;
+
+  foundImages: number = 21313
+  customAllowedTypes: string = allowedImageExtension.map(img => `${img}`).join(',')
+  tags: ITag[] = []
+  isLoading = false;
 
   constructor(private ocrProvider: OcrProvider,
-              private es: ElectronService) {
-  }
+              private es: ElectronService) {}
 
-  ngOnInit(): void {
-    this.ocrProvider.isTesseractLoaded.subscribe(res => {
-      this.isReady = true
-    })
+  ngOnInit(): void {}
 
-    this.ocrProvider.logs.subscribe(log => {
-      console.log(log)
-    })
-
-    // this.excel.appendRow({index: 0, path: 'ok', text: 'asdasd', tags: 'dasdasd'})
-    // this.excel.appendRow({index: 0, path: 'ok', text: 'asdasd', tags: 'dasdasd'})
-    // this.excel.appendRow({index: 0, path: 'ok', text: 'asdasd', tags: 'dasdasd'})
-    // this.excel.appendRow({index: 0, path: 'ok', text: 'asdasd', tags: 'dasdasd'})
-    // this.excel.appendRow({index: 0, path: 'ok', text: 'asdasd', tags: 'dasdasd'})
-    // this.excel.appendRow({index: 0, path: 'ok', text: 'asdasd', tags: 'dasdasd'})
-    // this.excel.save({
-    //   ...saveOptions,
-    //   defaultPath: 'tex111t.xlsx'
-    // })
+  addTangHandler(tags: ITag[]) {
+    this.tags = tags
   }
 
 
-  test() {
-    this.es.remote.dialog.showOpenDialog({
-    }).then(result => {
-      console.log(result.canceled)
-      console.log(result.filePaths)
-      if (this.isReady) {
-        this.ocrProvider.convertImagePathToText(result.filePaths[0])
-          .then((e) => console.log(e))
-      }
+  async selectHandler() {
+    try {
+      const {filePaths, canceled} = await this.es.remote.dialog.showOpenDialog({
+        properties: [],
+        filters: [
+          { name: 'Images', extensions: allowedImageExtension },
+        ]
+      })
+      console.log(filePaths)
+      this.pathToLoad = canceled ? null : filePaths[0]
+    } catch (e)  {
+      console.log(e)
+      this.pathToLoad = null
+    }
+  }
 
-    }).catch(err => {
-      console.log(err)
-    })
+  close() {
+    this.pathToLoad = null
   }
 
 }
