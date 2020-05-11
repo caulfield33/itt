@@ -18,9 +18,9 @@
             </ng-template>
           </nz-empty>
 
-          <div *ngIf="pathToLoad !== null" [ngSwitch]="status">
+          <div *ngIf="pathToLoad !== null">
 
-            <div *ngSwitchCase="'wip'" class="wip">
+            <div class="wip">
               <h1 style="text-align: end;">
                 <i (click)="close()" class="close" nz-icon nzType="close" nzTheme="outline"></i>
               </h1>
@@ -29,7 +29,7 @@
                 <h2>{{pathToLoad}}</h2>
                 <nz-row [nzGutter]="16">
                   <nz-col [nzSpan]="12">
-                    <nz-statistic [nzValue]="foundImages" [nzTitle]="'Images Found'"></nz-statistic>
+                    <nz-statistic [nzValue]="foundImages.length" [nzTitle]="'Images Found'"></nz-statistic>
                   </nz-col>
                   <nz-col [nzSpan]="12">
                     <nz-statistic [nzValue]="customAllowedTypes" [nzTitle]="'Allowed image formats'"></nz-statistic>
@@ -37,23 +37,17 @@
                 </nz-row>
                 <br>
                 <nz-row>
-                  <nz-progress style="width: 100%;" [nzPercent]="70" nzStatus="exception"></nz-progress>
+                  <nz-progress style="width: 100%;" [nzPercent]="progress" [nzStatus]="status"></nz-progress>
                 </nz-row>
                 <br>
                 <nz-row>
 
                   <button (click)="start()" class="start" nz-button nzType="primary" nzBlock>Start</button>
+                  <button *ngIf="csv !== null && !isLoading" (click)="csv.save()" class="start" nz-button nzType="dashed" nzBlock>Save</button>
                 </nz-row>
               </nz-spin>
             </div>
-
-            <app-result *ngSwitchCase="'done'" status="success"
-                        title="title"
-                        subTitle="sub"
-                        (actionHandler)="resultActionHandler($event)" >
-            </app-result>
           </div>
-
         </div>
       </div>
     </nz-content>

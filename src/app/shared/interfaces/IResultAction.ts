@@ -1,3 +1,3 @@
 export interface IResultAction {
-  type: 'save' | 'pick' | 'again';
+  type: 'save' | 'pick' | 'again' | 'close';
 }

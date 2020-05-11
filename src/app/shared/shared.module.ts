@@ -13,18 +13,15 @@ import {
 } from "ng-zorro-antd";
 import { TagsComponent } from './components/tags/tags.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import { ResultComponent } from './components/result/result.component';
 
 @NgModule({
   declarations: [
     TablePreviewComponent,
     TagsComponent,
-    ResultComponent
   ],
   exports: [
     TablePreviewComponent,
     TagsComponent,
-    ResultComponent
   ],
     imports: [
         CommonModule,
