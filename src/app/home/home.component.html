@@ -18,9 +18,9 @@
             </ng-template>
           </nz-empty>
 
-          <div *ngIf="pathToLoad !== null">
+          <div *ngIf="pathToLoad !== null" [ngSwitch]="status">
 
-            <div class="wip">
+            <div *ngSwitchCase="'wip'" class="wip">
               <h1 style="text-align: end;">
                 <i (click)="close()" class="close" nz-icon nzType="close" nzTheme="outline"></i>
               </h1>
@@ -42,37 +42,18 @@
                 <br>
                 <nz-row>
 
-                  <button class="start" nz-button nzType="primary" nzBlock>Start</button>
+                  <button (click)="start()" class="start" nz-button nzType="primary" nzBlock>Start</button>
                 </nz-row>
               </nz-spin>
             </div>
 
-            <div *ngIf="true" class="done">
-              <nz-result
-                nzStatus="success"
-                nzTitle="All images was successfully converted to text!"
-                nzSubTitle="Now you can save CSV file with all information or chose other folder."
-              >
-                <div nz-result-extra>
-                  <button nz-button nzType="primary">Save</button>
-                  <button nz-button>Select other folder</button>
-                </div>
-              </nz-result>
-            </div>
-
-            <div *ngIf="true" class="fail">
-              <nz-result
-                nzTitle="Converting Failed"
-                nzStatus="error"
-              >
-                <div nz-result-extra>
-                  <button nz-button nzType="primary">Try again</button>
-                  <button nz-button>Select other folder</button>
-                </div>
-              </nz-result>
-            </div>
-
+            <app-result *ngSwitchCase="'done'" status="success"
+                        title="title"
+                        subTitle="sub"
+                        (actionHandler)="resultActionHandler($event)" >
+            </app-result>
           </div>
+
         </div>
       </div>
     </nz-content>

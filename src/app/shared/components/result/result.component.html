@@ -1,0 +1,16 @@
+<nz-result
+  [nzStatus]="status"
+  [nzTitle]="title"
+  [nzSubTitle]="subTitle"
+  [ngSwitch]="status">
+>
+  <div *ngSwitchCase="'success'" nz-result-extra>
+    <button (click)="buttonHandler('save')" nz-button nzType="primary">Save</button>
+    <button (click)="buttonHandler('pick')" nz-button>Select other folder</button>
+  </div>
+
+  <div  *ngSwitchCase="'error'" nz-result-extra>
+    <button (click)="buttonHandler('again')" nz-button nzType="primary">Try again</button>
+    <button (click)="buttonHandler('pick')" nz-button>Select other folder</button>
+  </div>
+</nz-result>

@@ -4,6 +4,7 @@ import {ElectronService} from "../core/services";
 import {allowedImageExtension} from "../shared/consts";
 import {BehaviorSubject, Observable, Observer, Subscription} from "rxjs";
 import {ITag} from "../shared/interfaces/ITag";
+import {IResultAction} from "../shared/interfaces/IResultAction";
 
 @Component({
   selector: 'app-home',
@@ -13,11 +14,13 @@ import {ITag} from "../shared/interfaces/ITag";
 export class HomeComponent implements OnInit {
 
   pathToLoad: string = null;
+  status: 'wip' | 'done' = 'wip';
+  isLoading = false;
 
   foundImages: number = 21313
   customAllowedTypes: string = allowedImageExtension.map(img => `${img}`).join(',')
   tags: ITag[] = []
-  isLoading = false;
+
 
   constructor(private ocrProvider: OcrProvider,
               private es: ElectronService) {}
@@ -28,6 +31,19 @@ export class HomeComponent implements OnInit {
     this.tags = tags
   }
 
+  async resultActionHandler(action: IResultAction) {
+    console.log(action)
+    switch (action.type) {
+      case "again":
+      case "pick":
+        await this.selectHandler()
+        break;
+      case "save":
+      default:
+        break;
+    }
+    this.status = "done";
+  }
 
   async selectHandler() {
     try {
@@ -37,12 +53,15 @@ export class HomeComponent implements OnInit {
           { name: 'Images', extensions: allowedImageExtension },
         ]
       })
-      console.log(filePaths)
       this.pathToLoad = canceled ? null : filePaths[0]
     } catch (e)  {
       console.log(e)
       this.pathToLoad = null
     }
+  }
+
+  start() {
+    this.status = "done";
   }
 
   close() {
