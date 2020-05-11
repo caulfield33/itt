@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
 import {ElectronService} from "../services";
 import {BehaviorSubject} from "rxjs";
+import {UtilsService} from "../services/utils/utils.service";
 
 @Injectable()
 export class OcrProvider {
@@ -15,7 +16,9 @@ export class OcrProvider {
   public isTesseractLoaded: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
   public logs: BehaviorSubject<any> = new BehaviorSubject<any>(null)
 
-  constructor(private es: ElectronService) {
+  constructor(
+    private utilsService: UtilsService,
+    private es: ElectronService) {
 
     this.init();
   }
@@ -31,12 +34,9 @@ export class OcrProvider {
 }
 
   convertImagePathToText(imagePath: string): Promise<any>  {
-    const extension = imagePath.split(".")
-    const base64 = this.es.fs.readFileSync(imagePath).toString('base64')
 
-    return this.tesseract.recognize(
-      `data:image/${extension[extension.length -1].toLocaleLowerCase()};base64,` + base64,
-      this.tesseractConfig
-    )
+    const base64 = this.utilsService.fromPathToBase64(imagePath)
+
+    return this.tesseract.recognize(base64, this.tesseractConfig)
   }
 }

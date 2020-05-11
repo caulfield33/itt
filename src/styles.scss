@@ -1,0 +1,8 @@
+.close{
+  cursor: pointer;
+  transition: 100ms ease-in-out;
+}
+
+.close:hover{
+  color: red;
+}

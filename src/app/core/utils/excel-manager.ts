@@ -37,11 +37,14 @@ export class ExcelManager {
     const { filePath, canceled } = await this.es.remote.dialog.showSaveDialog(options)
 
     return new Promise<boolean>( (resolve, reject) => {
-      if (!canceled) {
+      if (canceled) {
         reject(false)
       } else {
         this.workbook.xlsx.writeBuffer().then(data => {
-          this.es.fs.writeFile(filePath, data, {}, e => e === null ? resolve(true) : reject(false));
+          this.es.fs.writeFile(filePath, data, {}, e => {
+            console.log(e)
+           e === null ? resolve(true) : reject(false)
+          });
         });
       }
     })

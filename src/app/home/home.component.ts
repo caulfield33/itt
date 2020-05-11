@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import {OcrProvider} from "../core/providers/ocr";
 import {ElectronService} from "../core/services";
+import {allowedImageExtension} from "../shared/consts";
+import {ITag} from "../shared/interfaces/ITag";
 import {ExcelManager} from "../core/utils/excel-manager";
-import {saveOptions} from "../shared/consts";
+import {NzModalService} from "ng-zorro-antd";
 
 @Component({
   selector: 'app-home',
@@ -11,48 +13,118 @@ import {saveOptions} from "../shared/consts";
 })
 export class HomeComponent implements OnInit {
 
-  isReady = false;
-  excel: ExcelManager = new ExcelManager(this.es)
+  pathToLoad: string = null;
+  isLoading = false;
+  progress: number = 0;
+  foundImages: string[] = []
+  customAllowedTypes: string = allowedImageExtension.map(img => `${img}`).join(', ')
+  tags: ITag[] = []
+
+  csv: ExcelManager = null;
 
   constructor(private ocrProvider: OcrProvider,
-              private es: ElectronService) {
+              private modal: NzModalService,
+              private es: ElectronService) {}
+
+  ngOnInit(): void {}
+
+  addTangHandler(tags: ITag[]) {
+    this.tags = tags
   }
 
-  ngOnInit(): void {
-    this.ocrProvider.isTesseractLoaded.subscribe(res => {
-      this.isReady = true
-    })
+  async selectHandler() {
+    this.progress = 0;
 
-    this.ocrProvider.logs.subscribe(log => {
-      console.log(log)
-    })
+    try {
+      const {filePaths, canceled} = await this.es.remote.dialog.showOpenDialog({
+        properties: [],
+        filters: [
+          { name: 'Images', extensions: allowedImageExtension },
+        ]
+      })
+      this.pathToLoad = canceled ? null : filePaths[0]
 
-    // this.excel.appendRow({index: 0, path: 'ok', text: 'asdasd', tags: 'dasdasd'})
-    // this.excel.appendRow({index: 0, path: 'ok', text: 'asdasd', tags: 'dasdasd'})
-    // this.excel.appendRow({index: 0, path: 'ok', text: 'asdasd', tags: 'dasdasd'})
-    // this.excel.appendRow({index: 0, path: 'ok', text: 'asdasd', tags: 'dasdasd'})
-    // this.excel.appendRow({index: 0, path: 'ok', text: 'asdasd', tags: 'dasdasd'})
-    // this.excel.appendRow({index: 0, path: 'ok', text: 'asdasd', tags: 'dasdasd'})
-    // this.excel.save({
-    //   ...saveOptions,
-    //   defaultPath: 'tex111t.xlsx'
-    // })
+      let files = await this.es.fs.readdirSync(this.pathToLoad)
+
+      files = files
+        .map(file => this.es.path.join(this.pathToLoad, file))
+        .filter(file => {
+          return this.es.isFile(file) && allowedImageExtension.includes(this.es.path.extname(file).replace('.', ''))
+        })
+
+      this.foundImages = files;
+    } catch (e)  {
+      this.pathToLoad = null
+    }
   }
 
+  async start() {
+    this.csv = new ExcelManager(this.es)
+    this.isLoading = true;
+    this.progress = 0;
 
-  test() {
-    this.es.remote.dialog.showOpenDialog({
-    }).then(result => {
-      console.log(result.canceled)
-      console.log(result.filePaths)
-      if (this.isReady) {
-        this.ocrProvider.convertImagePathToText(result.filePaths[0])
-          .then((e) => console.log(e))
+    try {
+      for (let index = 0; index < this.foundImages.length; index++) {
+        const {data: { text }} = await this.ocrProvider.convertImagePathToText(this.foundImages[index])
+
+        const tags = [];
+
+        this.tags.forEach(tag => {
+          tag.keywords.forEach(keyword => {
+            if (text.toLocaleLowerCase().includes(keyword.toLocaleLowerCase())) tags.push(tag.name)
+          })
+        })
+
+        if (this.pathToLoad === null) break;
+
+        this.csv.appendRow({index: index + 1, path: this.foundImages[index], text, tags: tags.join(', ')})
+
+        this.progress = index / this.foundImages.length * 100
+
       }
 
-    }).catch(err => {
-      console.log(err)
-    })
+      this.progress = 100;
+
+      if (this.pathToLoad !== null) {
+        const modal = this.modal.create({
+          nzTitle: 'Success!',
+          nzContent: 'All images was successfully converted to text.',
+          nzFooter: [
+            {
+              label: 'Save',
+              type: 'primary',
+              onClick: () =>  {
+                this.csv.save()
+                modal.destroy()
+              }
+            },
+            {
+              label: 'Cancel',
+              type: 'default',
+              onClick: () => modal.destroy()
+            },
+          ]
+        });
+
+      }
+    } catch (e) {
+      console.log(e)
+
+      this.modal.error({
+        nzTitle: 'Error!',
+        nzContent: 'Some thing was wrong'
+      })
+
+      this.pathToLoad = null;
+      this.csv = null;
+    }
+
+    this.isLoading = false;
+  }
+
+  close() {
+    this.pathToLoad = null;
+    this.csv = null;
   }
 
 }

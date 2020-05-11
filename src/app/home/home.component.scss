@@ -1,6 +1,11 @@
-nz-header {
-  background: #fff;
-  padding: 0;
+.logo {
+  height: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 16px;
+}
+
+nz-layout{
+  height: -webkit-fill-available;
 }
 
 nz-content {
@@ -11,16 +16,15 @@ nz-breadcrumb {
   margin: 16px 0;
 }
 
-nz-sider{
-  height: 100vh;
-}
-
 .inner-content {
   padding: 24px;
   background: #fff;
-  min-height: 360px;
+  min-height: -webkit-fill-available;
+  margin: 24px 0;
 }
 
-nz-footer {
-  text-align: center;
+.start{
+  font-size: 24px;
+  height: 50px;
+  margin: 20px 0;
 }

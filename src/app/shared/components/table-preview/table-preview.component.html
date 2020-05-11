@@ -1,0 +1,14 @@
+
+<div *ngIf="imagesTableData && imagesTableData.selectedFolder">
+  <nz-divider nzOrientation="left" [nzText]="imagesTableData.selectedFolder.folderPath"></nz-divider>
+  <div nz-row [nzGutter]="[16, 24]">
+    <div
+      nz-col
+      *ngFor="let image of imagesTableData.selectedFolder.images"
+      class="gutter-row"
+      [nzSpan]="4">
+      {{image  | json}}
+      <div class="inner-box" [ngStyle]=" {'background-image': 'url(' + image + ')'} "></div>
+    </div>
+  </div>
+</div>
